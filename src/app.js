@@ -24,6 +24,11 @@ app.get("/restaurants", async (req, res) => {
   res.json(restaurants);
 });
 
+app.get("/restaurants/:id", async (req, res) => {
+  const restaurants = await Restaurant.findByPk(req.params.id);
+  res.json(restaurants);
+});
+
 app.post("/restaurants", async (req, res) => {
   const restaurant = await Restaurant.create(req.body);
   const restaurants = await Restaurant.findAll({});
@@ -34,7 +39,8 @@ app.put("/restaurants/:id", async (req, res) => {
   const updatedRestaurant = await Restaurant.update(req.body, {
     where: { id: req.params.id },
   });
-  res.json(updatedRestaurant);
+  const restaurant = await Restaurant.findAll({});
+  res.json(restaurant);
 });
 
 app.delete("/restaurants/:id", async (req, res) => {
