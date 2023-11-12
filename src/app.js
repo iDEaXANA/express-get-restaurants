@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const Restaurant = require("../models/index");
 const db = require("../db/connection");
+const { check, validationResult } = require("express-validator");
 
 //TODO: Create your GET Request Route Below:
 
@@ -29,11 +30,36 @@ app.get("/restaurants/:id", async (req, res) => {
   res.json(restaurants);
 });
 
-app.post("/restaurants", async (req, res) => {
-  const restaurant = await Restaurant.create(req.body);
-  const restaurants = await Restaurant.findAll({});
-  res.json(restaurants);
-});
+app.post(
+  "/restaurants",
+  [
+    check("name")
+      .not()
+      .isEmpty()
+      .withMessage("Name cannot be empty")
+      .custom((value) => !/\s/.test(value))
+      .withMessage("Name cannot contain whitespace"),
+    check("location")
+      .not()
+      .isEmpty()
+      .custom((value) => !/\s/.test(value)),
+    check("cuisine")
+      .not()
+      .isEmpty()
+      .custom((value) => !/\s/.test(value)),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.json({ error: errors.array() });
+    } else {
+      const restaurant = await Restaurant.create(req.body);
+      const restaurants = await Restaurant.findAll({});
+      res.json(restaurants);
+    }
+  }
+);
 
 app.put("/restaurants/:id", async (req, res) => {
   const updatedRestaurant = await Restaurant.update(req.body, {
