@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const Restaurant = require("../models/index");
+const { Restaurant, Menu, Item } = require("../models/index");
 const db = require("../db/connection");
 const { check, validationResult } = require("express-validator");
 
