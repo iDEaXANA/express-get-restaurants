@@ -1,11 +1,13 @@
 const request = require("supertest");
 const app = require("./src/app");
 const seedData = require("./seedData");
-const Restaurant = require("./models");
+const Restaurant = require("./models/Restaurant.js");
 const syncSeed = require("./seed.js"); // makes sure database is reset after each test!
+const db = require("./db/connection.js");
 let restQuantity;
 
 beforeAll(async () => {
+  await db.sync({ force: true });
   await syncSeed();
   const restaurants = await Restaurant.findAll({});
   restQuantity = restaurants.length;
@@ -85,14 +87,14 @@ beforeAll(async () => {
 //   });
 // });
 
-// describe("DELETE /restaurants/:id", () => {
-//   test("8. Updates the restaurant array with the provided id", async () => {
-//     await request(app).delete("/restaurants/1");
-//     const restaurants = await Restaurant.findAll({});
-//     expect(restaurants.length).toEqual(restQuantity);
-//     expect(restaurants[0].id).not.toEqual(1);
-//   });
-// });
+describe("DELETE /restaurants/:id", () => {
+  test("8. Updates the restaurant array with the provided id", async () => {
+    await request(app).delete("/restaurants/1");
+    const restaurants = await Restaurant.findAll({});
+    expect(restaurants.length).toEqual(restQuantity - 1);
+    expect(restaurants[0].id).not.toEqual(1);
+  });
+});
 
 describe("Errors are returned when Server Side Validation Requirements are not met", () => {
   test("1. Leaving 'name' input blank returns the correct error with array", async () => {
@@ -100,8 +102,8 @@ describe("Errors are returned when Server Side Validation Requirements are not m
       .post("/restaurants")
       .send({ name: "", location: "DZ", cuisine: "Bilalo" });
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("errors");
-    expect(Array.isArray(response.body.errors)).toBe(true);
+    expect(response.body).toHaveProperty("error");
+    expect(Array.isArray(response.body.error)).toBe(true);
     // const responseData = JSON.parse(response.text);
     // expect(responseData.error).toEqual([
     //   {

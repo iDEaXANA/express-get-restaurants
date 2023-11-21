@@ -21,7 +21,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/restaurants", async (req, res) => {
-  const restaurants = await Restaurant.findAll({});
+  const restaurants = await Restaurant.findAll({
+    include: [
+      {
+        model: Menu,
+        include: [Item],
+      },
+    ],
+  });
+
   res.json(restaurants);
 });
 
