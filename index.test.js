@@ -6,7 +6,7 @@ const syncSeed = require("./seed.js"); // makes sure database is reset after eac
 const db = require("./db/connection.js");
 let restQuantity;
 
-beforeAll(async () => {
+beforeEach(async () => {
   await db.sync({ force: true });
   await syncSeed();
   const restaurants = await Restaurant.findAll({});

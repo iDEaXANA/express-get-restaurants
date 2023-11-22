@@ -22,16 +22,18 @@ const syncSeed = async () => {
 
     console.log("Seeding items...");
     await Item.bulkCreate(seedItem);
+    const restaurant = await Restaurant.findByPk(1);
+    const menu = await Menu.findByPk(1);
+    console.log(menu);
+    const item = await Item.findByPk(1);
+    console.log(item);
+    await restaurant.addMenu(menu);
+    await menu.addItem(item);
 
     console.log("Database seeded successfully.");
   } catch (error) {
     console.error("Error seeding database:", error);
-  } finally {
-    // Close the database connection when done
-    await db.close();
   }
 };
-
-syncSeed();
 
 module.exports = syncSeed;
